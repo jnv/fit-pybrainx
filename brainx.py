@@ -3,10 +3,20 @@
 
 
 class BrainFuck:
-    """Interpretr jazyka brainfuck."""
+    """BrainFuck Interpreter
+
+    Attributes:
+    data -- string with the program instructions
+    memory -- program's data/memory
+    output -- run output stored in string
+    instruction_pointer -- data pointer
+    memory_pointer -- memory pointer
+    show_output -- whether to print program's output
+
+    """
     
     def __init__(self, data, memory=b'\x00', output='', instruction_pointer=0, memory_pointer=0, show_output=True):
-        """Inicializace překladače."""
+        """Interpreter initialization"""
         
         # data programu
         self.data = data
@@ -22,11 +32,11 @@ class BrainFuck:
         # b) ukaž výstup
         self.show_output = show_output
     
-    #
-    # prováděcí metoda interpretru
-    #
     def run(self):
-        """Spustí načtený brainfuckovský program."""
+        """Execute the program"""
+
+
+
     
     #
     # pro potřeby testů
