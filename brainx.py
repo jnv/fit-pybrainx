@@ -34,8 +34,12 @@ class BrainFuck:
         # b) ukaž výstup
         self.show_output = show_output
 
-    def run(self):
-        """Execute the program stored in self.data"""
+    def run(self, end = None):
+        """Execute the program stored in self.data
+
+        Named parameters:
+        end -- boundary of the current call, used for loops recursion
+        """
 
         #TODO: Remove NOPs from data? using filter
 
@@ -46,11 +50,13 @@ class BrainFuck:
             '-': self.__memory_dec,
             '.': self.__print,
             ',': self.__read,
-            '[': self.__jump_fwd,
-            ']': self.__jump_bwd,
+            '[': self.__loop,
+            ']': self.__loop_end,
             }
 
-        while self.instruction_pointer < len(self.data):
+        if end is None:
+            end = len(self.data)
+        while self.instruction_pointer < end:
             cmd = self.data[self.instruction_pointer]
             commands.get(cmd, self.__nop)()
             self.instruction_pointer += 1
@@ -61,6 +67,11 @@ class BrainFuck:
     def get_current_memory(self):
         return self.memory[self.memory_pointer]
 
+    def get_instruction(self, at = None):
+        if at is None:
+            at = self.instruction_pointer
+        return self.data[at]
+
     def __nop(self):
         pass
 
@@ -70,7 +81,7 @@ class BrainFuck:
         """
         self.memory_pointer += 1
         if self.memory_pointer == len(self.memory):
-            self.memory.append(b'\x00')
+            self.memory.append(0)
 
     def __ptr_dec(self):
         """Decrement memory_pointer"""
@@ -100,7 +111,7 @@ class BrainFuck:
 
     def __print(self):
         char = self.get_current_memory()
-        self.output += char
+        self.output += chr(char)
 
         if self.show_output:
             sys.stdout.write(chr(char))
@@ -109,11 +120,31 @@ class BrainFuck:
         #TODO not yet implemented
         pass
 
-    def __jump_fwd(self):
-        pass
+    def __loop(self):
+        """Handle an opening and closing loops"""
+        #based on J. Tauber's implementation: http://speakerdeck.com/u/jtauber/p/you-used-python-for-what
 
-    def __jump_bwd(self):
-        pass
+        depth = 1
+        start = end = self.instruction_pointer
+
+        while depth:
+            # forward seek opening and closing braces
+            end += 1
+            if self.get_instruction(end) == "[":
+                depth += 1 # Nest deeper
+            elif self.get_instruction(end) == "]":
+                depth -= 1
+
+        while self.get_current_memory() > 0:
+            #nested execution until current memory != 0
+            self.instruction_pointer = start + 1 # move after the opening brace
+            self.run(end)
+        self.instruction_pointer = end # jump to the end of loop
+
+
+
+    def __loop_end(self):
+        raise SyntaxError("Unbalanced closing brace at %d" % self.instruction_pointer)
 
 
 class BrainLoller():
