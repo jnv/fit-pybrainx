@@ -11,7 +11,7 @@ class KnownOutputs(unittest.TestCase):
      
     def setUp(self):
         self.BF = brainx.BrainFuck
-        self.BC = brainx.BrainCopter
+        #self.BC = brainx.BrainCopter
         self.BL = brainx.BrainLoller
         self.PngReader = image_png.PngReader
         #self.PnmWriter = image_pnm.PnmWriter()

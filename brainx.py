@@ -1,5 +1,6 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from distutils import command
 import sys
 
 
@@ -8,7 +9,7 @@ class BrainFuck:
 
     Attributes:
     data -- string with the program instructions
-    memory -- program's data/memory
+    memory -- bytearray with program's memory
     output -- run output stored in string
     instruction_pointer -- data pointer
     memory_pointer -- memory pointer
@@ -23,7 +24,7 @@ class BrainFuck:
         self.data = data
 
         # inicializace proměnných
-        self.memory = memory
+        self.memory = bytearray(memory)
         self.instruction_pointer = instruction_pointer
         self.memory_pointer = memory_pointer
 
@@ -39,8 +40,8 @@ class BrainFuck:
         #TODO: Remove NOPs from data? using filter
 
         commands = {
-            '>': self.__data_inc,
-            '<': self.__data_dec,
+            '>': self.__ptr_inc,
+            '<': self.__ptr_dec,
             '+': self.__memory_inc,
             '-': self.__memory_dec,
             '.': self.__print,
@@ -52,14 +53,10 @@ class BrainFuck:
         while self.instruction_pointer < len(self.data):
             cmd = self.data[self.instruction_pointer]
             commands.get(cmd, self.__nop)()
+            self.instruction_pointer += 1
 
-    #
-    # pro potřeby testů
-    #
     def get_memory(self):
-        # Nezapomeňte upravit získání návratové hodnoty podle vaší implementace!
-        return self.memory
-
+        return self.memory # FIXME explicitly convert to bytes -- is it needed?
 
     def get_current_memory(self):
         return self.memory[self.memory_pointer]
@@ -67,17 +64,39 @@ class BrainFuck:
     def __nop(self):
         pass
 
-    def __data_inc(self):
-        pass
+    def __ptr_inc(self):
+        """ Increment memory_pointer.
+        Append new data cell if at the boundary
+        """
+        self.memory_pointer += 1
+        if self.memory_pointer == len(self.memory):
+            self.memory.append(b'\x00')
 
-    def __data_dec(self):
-        pass
+    def __ptr_dec(self):
+        """Decrement memory_pointer"""
+        if self.memory_pointer > 0:
+            self.memory_pointer -= 1
+        #TODO allow writing before the beginning of the memory?
 
     def __memory_inc(self):
-        pass
+        """Increment memory under the pointer
+        If the current byte is 255, it will overflow to 0
+        """
+        current = self.get_current_memory()
+        if current < 255:
+            self.memory[self.memory_pointer] += 1
+        else:
+            self.memory[self.memory_pointer] = 0
 
     def __memory_dec(self):
-        pass
+        """Decrement memory under the pointer
+        If the current byte is 0, it will underflow to 255
+        """
+        current = self.get_current_memory()
+        if current > 0:
+            self.memory[self.memory_pointer] -= 1
+        else:
+            self.memory[self.memory_pointer] = 255
 
     def __print(self):
         char = self.get_current_memory()
@@ -87,6 +106,7 @@ class BrainFuck:
             sys.stdout.write(chr(char))
 
     def __read(self):
+        #TODO not yet implemented
         pass
 
     def __jump_fwd(self):
