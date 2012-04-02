@@ -117,8 +117,9 @@ class BrainFuck:
             sys.stdout.write(chr(char))
 
     def __read(self):
-        #TODO not yet implemented
-        pass
+        c = sys.stdin.read(1)
+        self.memory[self.memory_pointer] = ord(c)
+
 
     def __loop(self):
         """Handle an opening and closing loops"""
