@@ -26,6 +26,7 @@ class PngReader():
         self.height = None
         self.bit_depth = None
         self.colour_type = None
+        self.interlace = None
 
         if bytes:
             self.file = io.BytesIO(filepath)
@@ -86,9 +87,34 @@ class PngReader():
             else:
                 break
 
-
+    # Decodes IHDR chunk, see http://www.w3.org/TR/PNG/#11IHDR
+    #
+    # Populates instance variables:
+    # self.width
+    # self.height
+    # self.bit_depth
+    # self.colour_type
+    # self.interlace
     def __ihdr(self, data):
-        pass
+        if len(data) != 13:
+            raise ValueError("IHDR chunk is %d bytes long, 13 expected" % len(data))
+
+        # width, height -- unsigned Int, 8 Bytes total
+        # bit_depth, colour_type, compression, filter, interlace -- unsigned char
+        (self.width, self.height, self.bit_depth, self.colour_type,
+         compression, filter, self.interlace) = struct.unpack("!2I5B", data)
+
+        if compression != 0:
+            raise ValueError("Invalid compression method %d" % compression)
+        if filter != 0:
+            raise ValueError("Invalid filter method %d" % filter)
+
+        if self.colour_type in (3, 4, 6):
+            raise NotImplementedError("Colour type %d is not supported" % self.colour_type)
+        elif self.colour_type not in (0, 2):
+            raise NotImplementedError("Invalid colour type %d" % self.colour_type)
+        #TODO: do some more comprehensive checks on header
+
 
     def __idat(self, data):
         pass
