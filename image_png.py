@@ -76,7 +76,7 @@ class PngReader():
         checksum = zlib.crc32(data, checksum)
         if struct.pack('!I', checksum) != crc:
             raise IOError("CRC doesn't match checksum")
-        return str(type), data
+        return str(type, 'ascii'), data
 
     def generate_chunks(self):
         while True:
@@ -87,12 +87,10 @@ class PngReader():
                 break
 
 
-    def __ihdr(self):
-        print("IHDR")
+    def __ihdr(self, data):
         pass
 
-    def __idat(self):
-        print("IDAT")
+    def __idat(self, data):
         pass
 
 
