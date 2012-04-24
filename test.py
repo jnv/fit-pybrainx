@@ -92,14 +92,16 @@ class KnownOutputs(unittest.TestCase):
 
     def test_png_1(self):
         """load standard PNG file"""
-        img = self.PngReader('test_data/HelloWorld.png')
+        img = self.PngReader('test_data/sachovnice.png')
         img.load()
-        self.assertEqual(img.width, 14)
-        self.assertEqual(img.height, 12)
+        self.assertEqual(img.width, 3)
+        self.assertEqual(img.height, 3)
         self.assertEqual(img.colour_type, 2) #RGB
         self.assertEqual(img.bit_depth, 8)
         self.assertEqual(img.interlace, 0)
+        self.assertEqual(img.line_bytes, 3*3)
 
+        self.assertEqual(img.idat_decomp, b'\x00\xff\x00\x00\x00\xff\x00\x00\x00\xff\x00\xff\xff\xff\x7f\x7f\x7f\x00\x00\x00\x00\xff\xff\x00\xff\x00\xff\x00\xff\xff')
 
     def test_png_2(self):
         """load broken signature"""

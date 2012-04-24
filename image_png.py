@@ -1,8 +1,29 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import io
+from itertools import zip_longest
 import struct
 import zlib
+from array import array
+
+# http://docs.python.org/py3k/library/itertools.html
+def grouper(n, iterable, fillvalue=None):
+    """grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
+
+def paeth(a, b, c):
+    p = a + b - c
+    pa = abs(p - a)
+    pb = abs(p - b)
+    pc = abs(p - c)
+    if pa <= pb and pa <= pc:
+        return a
+    elif pb <= pc:
+        return b
+    else:
+        return c
+
 
 class PngReader():
     """Třída pro práci s PNG-obrázky."""
@@ -27,6 +48,9 @@ class PngReader():
         self.bit_depth = None
         self.colour_type = None
         self.interlace = None
+        self.idat_decomp = None
+
+        self.line_bytes = None
 
         if bytes:
             self.file = io.BytesIO(filepath)
@@ -43,6 +67,9 @@ class PngReader():
         if signature != self._signature:
             raise IOError("Invalid PNG signature")
 
+        self.idat_decomp = bytearray()
+        self.decompressobj = zlib.decompressobj()
+
         chunk_funcs = {
             'IHDR': self.__ihdr,
             'IDAT': self.__idat,
@@ -57,6 +84,8 @@ class PngReader():
                 continue
             chunk_funcs[type](data)
 
+        self.idat_decomp += self.decompressobj.flush()
+        self.__process_raw(self.idat_decomp)
 
     def read_chunk(self):
         """
@@ -95,6 +124,7 @@ class PngReader():
     # self.bit_depth
     # self.colour_type
     # self.interlace
+    # self.row_len
     def __ihdr(self, data):
         if len(data) != 13:
             raise ValueError("IHDR chunk is %d bytes long, 13 expected" % len(data))
@@ -109,14 +139,39 @@ class PngReader():
         if filter != 0:
             raise ValueError("Invalid filter method %d" % filter)
 
-        if self.colour_type in (3, 4, 6):
+        if self.bit_depth != 8:
+            raise NotImplementedError("Bit depth %d is not supported" % self.colour_type)
+        if self.colour_type in (0, 3, 4, 6):
             raise NotImplementedError("Colour type %d is not supported" % self.colour_type)
-        elif self.colour_type not in (0, 2):
-            raise NotImplementedError("Invalid colour type %d" % self.colour_type)
-        #TODO: do some more comprehensive checks on header
+        elif self.colour_type != 2:
+            raise ValueError("Invalid colour type %d" % self.colour_type)
+            #TODO: do some more comprehensive checks on header
 
+        # 3*8 = 24 b per pixel
+        # 24 * width
+        self.line_bytes = 3 * self.width # XXX this is wild assumption
+        # * self.bit_depth / 8
 
+    # Adds IDAT data for decompression
+    # For the real fun see self.__process_raw
     def __idat(self, data):
-        pass
+        self.idat_decomp += self.decompressobj.decompress(data)
 
+    def __process_raw(self, raw_data):
+        expected_len = self.width * 3 * self.height + self.height
+        if len(raw_data) != expected_len:
+            raise ValueError(
+                "Expected length of decompressed data to be %d, got %d instead" % {expected_len, len(raw_data)})
 
+        self.lines = []
+        # Iterate each line (+1 byte = filter type)
+        for line in grouper(self.line_bytes + 1, raw_data):
+            recon = self.__process_filter(line[0], line[1:])
+            self.lines.append(recon)
+
+    def __process_filter(self, type, line):
+        # 0: no filter
+        if type == 0:
+            return line
+
+        raise NotImplementedError("Filter type %d is not implemented" % type)
