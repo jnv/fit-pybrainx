@@ -90,7 +90,8 @@ class KnownOutputs(unittest.TestCase):
         program.run()
         self.assertEqual(program.output, 'Hello World!')
 
-    def test_png_1(self):
+class KnownOutputs2(unittest.TestCase):
+     def test_png_1(self):
         """load standard PNG file"""
         img = self.PngReader('test_data/sachovnice.png')
         img.load()
@@ -107,9 +108,6 @@ class KnownOutputs(unittest.TestCase):
         """load broken signature"""
         img = self.PngReader(filepath=b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0d\x0a', bytes=True)
         self.assertRaises(IOError, img.load)
-
-
-
 
 # zajištění spuštění testů při zavolání souboru z příkazové řádky
 if __name__ == '__main__':

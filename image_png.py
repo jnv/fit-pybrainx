@@ -118,14 +118,21 @@ class PngReader():
 
     # Decodes IHDR chunk, see http://www.w3.org/TR/PNG/#11IHDR
     #
-    # Populates instance variables:
-    # self.width
-    # self.height
-    # self.bit_depth
-    # self.colour_type
-    # self.interlace
-    # self.row_len
+
     def __ihdr(self, data):
+        """
+        Decodes IHDR chunk, see http://www.w3.org/TR/PNG/#11IHDR
+        
+        Populates instance variables:
+         self.width
+         self.height
+         self.bit_depth
+         self.colour_type
+         self.interlace
+         self.row_len
+        """
+    
+    
         if len(data) != 13:
             raise ValueError("IHDR chunk is %d bytes long, 13 expected" % len(data))
 
@@ -152,12 +159,16 @@ class PngReader():
         self.line_bytes = 3 * self.width # XXX this is wild assumption
         # * self.bit_depth / 8
 
-    # Adds IDAT data for decompression
-    # For the real fun see self.__process_raw
     def __idat(self, data):
+    """
+    Decompress IDAT chunk, add it to self.idat_decomp
+    """
         self.idat_decomp += self.decompressobj.decompress(data)
 
     def __process_raw(self, raw_data):
+    """
+    Process raw decompressed data
+    """
         expected_len = self.width * 3 * self.height + self.height
         if len(raw_data) != expected_len:
             raise ValueError(
@@ -170,6 +181,9 @@ class PngReader():
             self.lines.append(recon)
 
     def __process_filter(self, type, line):
+    """
+    Handle filters
+    """
         # 0: no filter
         if type == 0:
             return line
