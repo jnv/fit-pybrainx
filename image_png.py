@@ -12,6 +12,7 @@ def grouper(n, iterable, fillvalue=None):
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
+
 def paeth_predict(a, b, c):
     p = a + b - c
     pa = abs(p - a)
@@ -23,6 +24,7 @@ def paeth_predict(a, b, c):
         return b
     else:
         return c
+
 
 class PngReader():
     """Třída pro práci s PNG-obrázky."""
@@ -185,7 +187,7 @@ class PngReader():
         pass
 
 
-    def __process_filter(self, type, line, prev):
+    def __process_filter(self, type, line, prev_line):
         """
         Handle filters
         """
@@ -196,7 +198,6 @@ class PngReader():
             Recon(x) = Filt(x) + Recon(previous_byte)
             Where previous_byte is on same position in previous pixel
             """
-            prev_byte = 0
             prev_pos = -px_bytes
             for byte in line:
                 if prev_pos >= 0:
@@ -209,19 +210,27 @@ class PngReader():
             Recon(x) = Filt(x) + Recon(prev_line)
             """
             for i, byte in enumerate(line):
-                byte = (byte + prev[i]) % 256
+                byte = (byte + prev_line[i]) % 256
                 recon.append(byte)
 
         def average():
             """
             Filt(x) + floor((Recon(prev_byte) + Recon(prev_line)) / 2)
             """
+            prev_pos = -px_bytes
+            for i, byte in enumerate(line):
+                prev_byte = 0
+                if prev_pos >= 0:
+                    prev_byte = recon[prev_pos]
+
+                byte = (byte + (prev_line[i] + prev_byte) // 2) % 256
+                recon.append(byte)
+                prev_pos += 1
 
         def paeth():
             """
             Filt(x) + PaethPredictor(Recon(prev_byte), Recon(prev_line), Recon(prev_line_prev_byte))
             """
-
 
 
         recon = bytearray()
