@@ -206,8 +206,11 @@ class PngReader():
 
         def up():
             """
-            Recon(x) = Filt(x) + Recon(b)
+            Recon(x) = Filt(x) + Recon(prev_line)
             """
+            for i, byte in enumerate(line):
+                byte = (byte + prev[i]) % 256
+                recon.append(byte)
 
         def average():
             """
