@@ -231,6 +231,18 @@ class PngReader():
             """
             Filt(x) + PaethPredictor(Recon(prev_byte), Recon(prev_line), Recon(prev_line_prev_byte))
             """
+            prev_pos = -px_bytes
+            for i, x in enumerate(line):
+                a = 0
+                b = prev_line[i]
+                c = 0
+                if prev_pos >= 0:
+                    a = recon[prev_pos]
+                    c = prev_line[prev_pos]
+
+                x = (x + paeth_predict(a, b, c)) % 256
+                recon.append(x)
+                prev_pos += 1
 
 
         recon = bytearray()
