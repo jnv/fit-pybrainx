@@ -12,6 +12,7 @@ def grouper(n, iterable, fillvalue=None):
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
+
 def paeth(a, b, c):
     p = a + b - c
     pa = abs(p - a)
@@ -131,8 +132,7 @@ class PngReader():
          self.interlace
          self.row_len
         """
-    
-    
+
         if len(data) != 13:
             raise ValueError("IHDR chunk is %d bytes long, 13 expected" % len(data))
 
@@ -142,16 +142,17 @@ class PngReader():
          compression, filter, self.interlace) = struct.unpack("!2I5B", data)
 
         if compression != 0:
-            raise ValueError("Invalid compression method %d" % compression)
+            raise ValueError("Invalid compression method {}".format(compression))
         if filter != 0:
-            raise ValueError("Invalid filter method %d" % filter)
+            raise ValueError("Invalid filter method {}".format(filter))
 
         if self.bit_depth != 8:
-            raise NotImplementedError("Bit depth %d is not supported" % self.colour_type)
+            raise NotImplementedError("Bit depth {} is not supported".format(self.colour_type))
+
         if self.colour_type in (0, 3, 4, 6):
-            raise NotImplementedError("Colour type %d is not supported" % self.colour_type)
+            raise NotImplementedError("Colour type {} is not supported".format(self.colour_type))
         elif self.colour_type != 2:
-            raise ValueError("Invalid colour type %d" % self.colour_type)
+            raise ValueError("Invalid colour type {}".format(self.colour_type))
             #TODO: do some more comprehensive checks on header
 
         # 3*8 = 24 b per pixel
@@ -160,19 +161,20 @@ class PngReader():
         # * self.bit_depth / 8
 
     def __idat(self, data):
-    """
-    Decompress IDAT chunk, add it to self.idat_decomp
-    """
+        """
+        Decompress IDAT chunk, add it to self.idat_decomp
+        """
         self.idat_decomp += self.decompressobj.decompress(data)
 
     def __process_raw(self, raw_data):
-    """
-    Process raw decompressed data
-    """
+        """
+        Process raw decompressed data
+        """
         expected_len = self.width * 3 * self.height + self.height
         if len(raw_data) != expected_len:
             raise ValueError(
-                "Expected length of decompressed data to be %d, got %d instead" % {expected_len, len(raw_data)})
+                "Expected length of decompressed data to be {}, got {} instead".format(expected_len, len(raw_data))
+            )
 
         self.lines = []
         # Iterate each line (+1 byte = filter type)
@@ -181,11 +183,11 @@ class PngReader():
             self.lines.append(recon)
 
     def __process_filter(self, type, line):
-    """
-    Handle filters
-    """
+        """
+        Handle filters
+        """
         # 0: no filter
         if type == 0:
             return line
 
-        raise NotImplementedError("Filter type %d is not implemented" % type)
+        raise NotImplementedError("Filter type {} is not implemented".format(type))
