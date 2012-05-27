@@ -90,8 +90,12 @@ class KnownOutputs(unittest.TestCase):
         program.run()
         self.assertEqual(program.output, 'Hello World!')
 
+
 class KnownOutputs2(unittest.TestCase):
-     def test_png_1(self):
+    def setUp(self):
+        self.PngReader = image_png.PngReader
+
+    def test_png_1(self):
         """load standard PNG file"""
         img = self.PngReader('test_data/sachovnice.png')
         img.load()
@@ -100,9 +104,10 @@ class KnownOutputs2(unittest.TestCase):
         self.assertEqual(img.colour_type, 2) #RGB
         self.assertEqual(img.bit_depth, 8)
         self.assertEqual(img.interlace, 0)
-        self.assertEqual(img.line_bytes, 3*3)
+        self.assertEqual(img.line_bytes, 3 * 3)
+        self.assertEqual(img.idat_decomp,
+            b'\x00\xff\x00\x00\x00\xff\x00\x00\x00\xff\x00\xff\xff\xff\x7f\x7f\x7f\x00\x00\x00\x00\xff\xff\x00\xff\x00\xff\x00\xff\xff')
 
-        self.assertEqual(img.idat_decomp, b'\x00\xff\x00\x00\x00\xff\x00\x00\x00\xff\x00\xff\xff\xff\x7f\x7f\x7f\x00\x00\x00\x00\xff\xff\x00\xff\x00\xff\x00\xff\xff')
 
     def test_png_2(self):
         """load broken signature"""
