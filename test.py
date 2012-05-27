@@ -92,11 +92,11 @@ class KnownOutputs(unittest.TestCase):
         self.assertEqual(program.output, 'Hello World!')
 
 
-class KnownOutputs2(unittest.TestCase):
+class ImagePngTest(unittest.TestCase):
     def setUp(self):
         self.PngReader = image_png.PngReader
 
-    def test_png_1(self):
+    def test_load(self):
         """load standard PNG file"""
         img = self.PngReader('test_data/sachovnice.png')
         img.load()
@@ -110,7 +110,7 @@ class KnownOutputs2(unittest.TestCase):
             b'\x00\xff\x00\x00\x00\xff\x00\x00\x00\xff\x00\xff\xff\xff\x7f\x7f\x7f\x00\x00\x00\x00\xff\xff\x00\xff\x00\xff\x00\xff\xff')
 
 
-    def test_png_2(self):
+    def test_load_sig(self):
         """load broken signature"""
         img = self.PngReader(filepath=b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0d\x0a', bytes=True)
         self.assertRaises(IOError, img.load)
