@@ -182,31 +182,59 @@ class PngReader():
             self.lines.append(recon)
             prev_line = self.lines[-1] # Assign the unfiltered last line
 
+        pass
+
 
     def __process_filter(self, type, line, prev):
         """
         Handle filters
         """
+        px_bytes = 3 # True color: pixel has 3 bytes
 
         def sub():
             """
             Recon(x) = Filt(x) + Recon(previous_byte)
-            assume 0 for previous byte of first byte
+            Where previous_byte is on same position in previous pixel
             """
             prev_byte = 0
-            for filt in line:
-                recon = (filt + prev_byte) % 256
-                ret.append(recon)
-                prev_byte = filt
+            prev_pos = -px_bytes
+            for byte in line:
+                if prev_pos >= 0:
+                    byte = (byte + recon[prev_pos]) % 256
+                recon.append(byte)
+                prev_pos += 1
 
-        ret = bytearray()
+        def up():
+            """
+            Recon(x) = Filt(x) + Recon(b)
+            """
+
+        def average():
+            """
+            Filt(x) + floor((Recon(prev_byte) + Recon(prev_line)) / 2)
+            """
+
+        def paeth():
+            """
+            Filt(x) + PaethPredictor(Recon(prev_byte), Recon(prev_line), Recon(prev_line_prev_byte))
+            """
+
+
+
+        recon = bytearray()
         # 0: no filter
         if type == 0:
-            return line
+            recon.extend(line)
         elif type == 1:
             sub()
+        elif type == 2:
+            up()
+        elif type == 3:
+            average()
+        elif type == 4:
+            paeth()
         else:
             raise ValueError("Invalid filter type {}".format(type))
 
-        return ret
+        return recon
 

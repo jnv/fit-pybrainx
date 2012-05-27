@@ -115,7 +115,7 @@ class KnownOutputs2(unittest.TestCase):
         img = self.PngReader(filepath=b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0d\x0a', bytes=True)
         self.assertRaises(IOError, img.load)
 
-    def test_png_3(self):
+    def test_png_filters(self):
         """test filters"""
         files = ('f00n2c08.png', 'f01n2c08.png', 'f02n2c08.png', 'f03n2c08.png', 'f04n2c08.png')
         for file in files:
@@ -124,7 +124,15 @@ class KnownOutputs2(unittest.TestCase):
             img.load()
             self.assertEqual(img.width, 32)
             self.assertEqual(img.height, 32)
-            self.assertEqual(len(img.idat_decomp), (32*32*3)+32)
+            self.assertEqual(len(img.idat_decomp), (32 * 32 * 3) + 32)
+
+            nonf_path = os.path.join('test_data', 'nonf', file)
+            nonf_img = self.PngReader(nonf_path)
+            nonf_img.load()
+
+            #assert img.lines == nonf_img.lines, "{}: Non-filtered image doesn't match unfiltered one".format(file)
+            self.assertEquals(img.lines, nonf_img.lines,
+                "{}: Non-filtered image doesn't match unfiltered one".format(file))
 
 
 # zajištění spuštění testů při zavolání souboru z příkazové řádky
