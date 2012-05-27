@@ -50,6 +50,7 @@ class PngReader():
         self.colour_type = None
         self.interlace = None
         self.idat_decomp = None
+        self.px_bytes = 3
 
         self.line_bytes = None
 
@@ -58,7 +59,21 @@ class PngReader():
         else:
             self.file = open(filepath, 'rb') # @type io.BufferedReader
 
-    #
+
+    def get_pixel(self, x, y):
+        if not self.lines:
+            return None
+
+        if 0 > x > (self.width-1):
+            raise ValueError("Invalid X position: {} for image of width {}".format(x, self.width))
+        elif 0 > y > (self.height -1):
+            raise ValueError("Invalid Y position: {} for image of height {}".format(y, self.height))
+
+        byte_x =  x * self.px_bytes
+
+        return bytes(self.lines[y][byte_x:(byte_x+self.px_bytes)])
+
+#
     # hlavní načítací funkce
     #
     def load(self):
@@ -123,7 +138,7 @@ class PngReader():
     def __ihdr(self, data):
         """
         Decodes IHDR chunk, see http://www.w3.org/TR/PNG/#11IHDR
-        
+
         Populates instance variables:
          self.width
          self.height

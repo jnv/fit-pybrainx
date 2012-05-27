@@ -134,6 +134,16 @@ class KnownOutputs2(unittest.TestCase):
             self.assertEquals(img.lines, nonf_img.lines,
                 "{}: Non-filtered image doesn't match unfiltered one".format(file))
 
+    def test_png_get_pixel(self):
+        img = self.PngReader('test_data/sachovnice.png')
+        img.load()
+
+        assert img.get_pixel(0,0) == b'\xff\x00\x00'
+        assert img.get_pixel(1,0) == b'\x00\xff\x00'
+        assert img.get_pixel(2,0) == b'\x00\x00\xff'
+        assert img.get_pixel(0,1) == b'\xff\xff\xff'
+        assert img.get_pixel(1,1) == b'\x7f\x7f\x7f'
+        assert img.get_pixel(2,1) == b'\x00\x00\x00'
 
 # zajištění spuštění testů při zavolání souboru z příkazové řádky
 if __name__ == '__main__':
