@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # import modulu zodpovědného za testy jednotek
 import unittest
+import os
 # import testovaných modulů
 import brainx
 import image_png
@@ -113,6 +114,18 @@ class KnownOutputs2(unittest.TestCase):
         """load broken signature"""
         img = self.PngReader(filepath=b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0d\x0a', bytes=True)
         self.assertRaises(IOError, img.load)
+
+    def test_png_3(self):
+        """test filters"""
+        files = ('f00n2c08.png', 'f01n2c08.png', 'f02n2c08.png', 'f03n2c08.png', 'f04n2c08.png')
+        for file in files:
+            path = os.path.join('test_data', file)
+            img = self.PngReader(path)
+            img.load()
+            self.assertEqual(img.width, 32)
+            self.assertEqual(img.height, 32)
+            self.assertEqual(len(img.idat_decomp), (32*32*3)+32)
+
 
 # zajištění spuštění testů při zavolání souboru z příkazové řádky
 if __name__ == '__main__':

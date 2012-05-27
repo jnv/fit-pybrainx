@@ -12,8 +12,7 @@ def grouper(n, iterable, fillvalue=None):
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
-
-def paeth(a, b, c):
+def paeth_predict(a, b, c):
     p = a + b - c
     pa = abs(p - a)
     pb = abs(p - b)
@@ -24,7 +23,6 @@ def paeth(a, b, c):
         return b
     else:
         return c
-
 
 class PngReader():
     """Třída pro práci s PNG-obrázky."""
@@ -177,17 +175,38 @@ class PngReader():
             )
 
         self.lines = []
+        prev_line = [0] * self.line_bytes # Non-existent line is considered as zeroes
         # Iterate each line (+1 byte = filter type)
         for line in grouper(self.line_bytes + 1, raw_data):
-            recon = self.__process_filter(line[0], line[1:])
+            recon = self.__process_filter(line[0], line[1:], prev_line)
             self.lines.append(recon)
+            prev_line = self.lines[-1] # Assign the unfiltered last line
 
-    def __process_filter(self, type, line):
+
+    def __process_filter(self, type, line, prev):
         """
         Handle filters
         """
+
+        def sub():
+            """
+            Recon(x) = Filt(x) + Recon(previous_byte)
+            assume 0 for previous byte of first byte
+            """
+            prev_byte = 0
+            for filt in line:
+                recon = (filt + prev_byte) % 256
+                ret.append(recon)
+                prev_byte = filt
+
+        ret = bytearray()
         # 0: no filter
         if type == 0:
             return line
+        elif type == 1:
+            sub()
+        else:
+            raise ValueError("Invalid filter type {}".format(type))
 
-        raise NotImplementedError("Filter type {} is not implemented".format(type))
+        return ret
+
