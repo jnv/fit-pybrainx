@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from image_png import PngReader
+from getch import getch
 
 class BrainFuck:
     """BrainFuck Interpreter
@@ -116,7 +117,8 @@ class BrainFuck:
             sys.stdout.write(chr(char))
 
     def __read(self):
-        c = sys.stdin.read(1)
+        #c = sys.stdin.read(1)
+        c = getch()
         self.memory[self.memory_pointer] = ord(c)
 
 
