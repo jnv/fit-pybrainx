@@ -149,6 +149,18 @@ class BrainFuck:
 class BrainLoller():
     """Třída pro zpracování jazyka brainloller."""
 
+    COMMANDS = {
+        b'\xff\x00\x00': '>',
+        b'\x80\x00\x00': '<',
+        b'\x00\xff\x00': '+',
+        b'\x00\x80\x00': '-',
+        b'\x00\x00\xff': '.',
+        b'\x00\x00\x80': ',',
+        b'\xff\xff\x00': '[',
+        b'\x80\x80\x00': ']',
+        }
+
+
     class Coord():
         """
         Handles 2D coordinates with
@@ -183,11 +195,28 @@ class BrainLoller():
         def turn_right(self):
             self.direction = (self.direction + 1) % 4
 
-
     def __init__(self, filename):
         self.coord = self.Coord()
         #self.file = filename
         self.img = PngReader(filename)
+
+
+    def __img_iter(self):
+        while True:
+            x, y = self.coord.get_pos()
+            try:
+                pixel = self.img.get_pixel(x, y)
+            except ValueError:
+                break
+
+            if pixel == b'\x00\xff\xff':
+                self.coord.turn_right()
+            elif pixel == b'\x00\x80\x80':
+                self.coord.turn_left()
+            else:
+                yield pixel
+
+            self.coord.step()
 
     #
     # načtení dat programu z obrázku
@@ -199,41 +228,16 @@ class BrainLoller():
         Return BF program as string
         """
 
-        def img_iter():
-            while True:
-                x, y = self.coord.get_pos()
-                try:
-                    pixel = self.img.get_pixel(x, y)
-                except ValueError:
-                    break
-
-                if pixel == b'\x00\xff\xff':
-                    self.coord.turn_right()
-                elif pixel == b'\x00\x80\x80':
-                    self.coord.turn_left()
-                else:
-                    yield pixel
-
-                self.coord.step()
-
-
         self.img.load()
         out = []
 
-        commands = {
-            b'\xff\x00\x00': '>',
-            b'\x80\x00\x00': '<',
-            b'\x00\xff\x00': '+',
-            b'\x00\x80\x00': '-',
-            b'\x00\x00\xff': '.',
-            b'\x00\x00\x80': ',',
-            b'\xff\xff\x00': '[',
-            b'\x80\x80\x00': ']',
-            }
-
-        for pixel in img_iter():
-            c = commands.get(pixel)
+        for pixel in self.__img_iter():
+            c = self.COMMANDS.get(pixel)
             if c:
                 out.append(c)
 
         return ''.join(out)
+
+
+class BrainCopter(BrainLoller):
+    pass
