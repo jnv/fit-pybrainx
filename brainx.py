@@ -240,4 +240,33 @@ class BrainLoller():
 
 
 class BrainCopter(BrainLoller):
-    pass
+    COMMANDS = {
+        0: '>',
+        1: '<',
+        2: '+',
+        3: '-',
+        4: '.',
+        5: ',',
+        6: '[',
+        7: ']',
+        }
+
+
+    def __img_iter(self):
+        while True:
+            x, y = self.coord.get_pos()
+            try:
+                pixel = self.img.get_pixel(x, y)
+            except ValueError:
+                break
+
+            #cmd =
+
+            if pixel == b'\x00\xff\xff':
+                self.coord.turn_right()
+            elif pixel == b'\x00\x80\x80':
+                self.coord.turn_left()
+            else:
+                yield pixel
+
+            self.coord.step()

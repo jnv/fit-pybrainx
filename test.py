@@ -13,7 +13,7 @@ import image_png
 class KnownOutputs(unittest.TestCase):
     def setUp(self):
         self.BF = brainx.BrainFuck
-        #self.BC = brainx.BrainCopter
+        self.BC = brainx.BrainCopter
         self.BL = brainx.BrainLoller
         self.PngReader = image_png.PngReader
         #self.PnmWriter = image_pnm.PnmWriter()
@@ -173,6 +173,25 @@ class BrainLollerTest(unittest.TestCase):
         coord.turn_left()
         self.assertEqual(coord.get_dir(), (-1, 0))
 
+class BrainCopterTest(unittest.TestCase):
+    def setUp(self):
+        self.BF = brainx.BrainFuck
+        self.BC = brainx.BrainCopter
+
+    def test_load(self):
+        """načtení dat z obrázku"""
+        img = self.BC('test_data/HelloWorldBC.png')
+        data = img.load()
+        self.assertEqual(data,
+            '>+++++++++[<++++++++>-]<.>+++++++[<++++>-]<+.+++++++..+++.>>>++++++++[<++++>-]<.>>>++++++++++[<+++++++++>-]<---.<<<<.+++.------.--------.>>+.')
+
+    def test_run(self):
+        """načtení dat z obrázku"""
+        img = self.BC('test_data/HelloWorldBC.png')
+        data = img.load()
+        program = self.BF(data, memory=b'\x00', output='', show_output=False)
+        program.run()
+        self.assertEqual(program.output, 'Hello World!')
 
 # zajištění spuštění testů při zavolání souboru z příkazové řádky
 if __name__ == '__main__':
