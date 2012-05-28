@@ -120,7 +120,7 @@ class BrainFuck:
             sys.stdout.flush()
 
     def __read(self):
-#        c = sys.stdin.read(1)
+    #        c = sys.stdin.read(1)
         c = getch()
         c = ord(c)
 
@@ -273,7 +273,7 @@ class BrainCopter(BrainLoller):
         logging.info("BrainCopter: Processing image")
         while True:
             x, y = self.coord.get_pos()
-            logging.debug("Pos {}×{}".format(x,y))
+            logging.debug("Pos {}×{}".format(x, y))
             try:
                 pixel = self.img.get_pixel(x, y)
             except ValueError:

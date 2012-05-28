@@ -173,6 +173,7 @@ class BrainLollerTest(unittest.TestCase):
         coord.turn_left()
         self.assertEqual(coord.get_dir(), (-1, 0))
 
+
 class BrainCopterTest(unittest.TestCase):
     def setUp(self):
         self.BF = brainx.BrainFuck

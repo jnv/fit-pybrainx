@@ -201,7 +201,7 @@ class PngReader():
             recon = self.__process_filter(line[0], line[1:], prev_line)
             self.lines.append(recon)
             prev_line = self.lines[-1] # Assign the unfiltered last line
-            i+= 1
+            i += 1
         logging.debug("{} lines loaded".format(i))
 
     def __process_filter(self, type, line, prev_line):
