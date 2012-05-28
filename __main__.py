@@ -6,6 +6,7 @@ __version__ = "0.0.1"
 
 import argparse
 import brainx
+import logging
 
 parser = argparse.ArgumentParser(prog='pybrainx', description='BrainFuck interpreter with BrainLoller and BrainCopter support') #description=''
 parser.add_argument('file', help='a file to process; text file for BrainFuck, PNG image for BrainLoller and BrainCopter')
@@ -16,13 +17,17 @@ group.add_argument('-c', '--braincopter', action='store_true', help='handle file
 
 args = parser.parse_args()
 
+logging.basicConfig(
+    format='%(levelname)s:%(message)s',
+    level=logging.DEBUG
+)
 
 if args.brainloller:
     img = brainx.BrainLoller(args.file)
     data = img.load()
 elif args.braincopter:
     img = brainx.BrainCopter(args.file)
-    data = img.load
+    data = img.load()
 else:
     with open(args.file, encoding='ascii') as stream:
         data = stream.read()

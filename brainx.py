@@ -1,8 +1,10 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import logging
 import sys
 from image_png import PngReader
 from getch import getch
+import logging
 
 class BrainFuck:
     """BrainFuck Interpreter
@@ -115,11 +117,21 @@ class BrainFuck:
 
         if self.show_output:
             sys.stdout.write(chr(char))
+            sys.stdout.flush()
 
     def __read(self):
-        #c = sys.stdin.read(1)
+#        c = sys.stdin.read(1)
         c = getch()
-        self.memory[self.memory_pointer] = ord(c)
+        c = ord(c)
+
+        if c == 4 or c == 3: # ^D, ^C
+            raise KeyboardInterrupt
+
+        if c == 27: # ESC
+            logging.debug("Escape catched, exiting")
+            sys.exit(0)
+
+        self.memory[self.memory_pointer] = c
 
 
     def __loop(self):
@@ -258,8 +270,10 @@ class BrainCopter(BrainLoller):
 
 
     def _img_iter(self):
+        logging.info("BrainCopter: Processing image")
         while True:
             x, y = self.coord.get_pos()
+            logging.debug("Pos {}×{}".format(x,y))
             try:
                 pixel = self.img.get_pixel(x, y)
             except ValueError:

@@ -4,7 +4,7 @@ import io
 from itertools import zip_longest
 import struct
 import zlib
-from array import array
+import logging
 
 # http://docs.python.org/py3k/library/itertools.html
 def grouper(n, iterable, fillvalue=None):
@@ -101,6 +101,7 @@ class PngReader():
             chunk_funcs[type](data)
 
         self.idat_decomp += self.decompressobj.flush()
+        logging.debug("ImagePng: processing raw data ")
         self.__process_raw(self.idat_decomp)
 
     def read_chunk(self):
@@ -193,14 +194,15 @@ class PngReader():
 
         self.lines = []
         prev_line = [0] * self.line_bytes # Non-existent line is considered as zeroes
+        i = 0
         # Iterate each line (+1 byte = filter type)
         for line in grouper(self.line_bytes + 1, raw_data):
+            logging.debug("Line {}".format(i))
             recon = self.__process_filter(line[0], line[1:], prev_line)
             self.lines.append(recon)
             prev_line = self.lines[-1] # Assign the unfiltered last line
-
-        pass
-
+            i+= 1
+        logging.debug("{} lines loaded".format(i))
 
     def __process_filter(self, type, line, prev_line):
         """
