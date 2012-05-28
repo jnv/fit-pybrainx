@@ -228,7 +228,7 @@ class BrainLoller():
             b'\x00\x00\xff': '.',
             b'\x00\x00\x80': ',',
             b'\xff\xff\x00': '[',
-            b'\x80\x80\x80': ']',
+            b'\x80\x80\x00': ']',
             }
 
         for pixel in img_iter():
