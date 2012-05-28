@@ -64,16 +64,16 @@ class PngReader():
         if not self.lines:
             return None
 
-        if 0 > x > (self.width-1):
+        if x < 0 or x > (self.width - 1):
             raise ValueError("Invalid X position: {} for image of width {}".format(x, self.width))
-        elif 0 > y > (self.height -1):
+        elif y < 0 or y > (self.height - 1):
             raise ValueError("Invalid Y position: {} for image of height {}".format(y, self.height))
 
-        byte_x =  x * self.px_bytes
+        byte_x = x * self.px_bytes
 
-        return bytes(self.lines[y][byte_x:(byte_x+self.px_bytes)])
+        return bytes(self.lines[y][byte_x:(byte_x + self.px_bytes)])
 
-#
+    #
     # hlavní načítací funkce
     #
     def load(self):
