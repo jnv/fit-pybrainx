@@ -201,7 +201,7 @@ class BrainLoller():
         self.img = PngReader(filename)
 
 
-    def __img_iter(self):
+    def _img_iter(self):
         while True:
             x, y = self.coord.get_pos()
             try:
@@ -231,7 +231,7 @@ class BrainLoller():
         self.img.load()
         out = []
 
-        for pixel in self.__img_iter():
+        for pixel in self._img_iter():
             c = self.COMMANDS.get(pixel)
             if c:
                 out.append(c)
@@ -252,7 +252,7 @@ class BrainCopter(BrainLoller):
         }
 
 
-    def __img_iter(self):
+    def _img_iter(self):
         while True:
             x, y = self.coord.get_pos()
             try:
@@ -260,13 +260,15 @@ class BrainCopter(BrainLoller):
             except ValueError:
                 break
 
-            #cmd =
+            r, g, b = pixel
 
-            if pixel == b'\x00\xff\xff':
+            cmd = (-2*r + 3*g + b) % 11
+
+            if cmd == 8:
                 self.coord.turn_right()
-            elif pixel == b'\x00\x80\x80':
+            elif cmd == 9:
                 self.coord.turn_left()
             else:
-                yield pixel
+                yield cmd
 
             self.coord.step()
