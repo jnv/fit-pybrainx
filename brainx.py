@@ -33,7 +33,7 @@ class BrainFuck:
         # b) ukaž výstup
         self.show_output = show_output
 
-    def run(self, end = None):
+    def run(self, end=None):
         """Execute the program stored in self.data
 
         Named parameters:
@@ -66,7 +66,7 @@ class BrainFuck:
     def get_current_memory(self):
         return self.memory[self.memory_pointer]
 
-    def get_instruction(self, at = None):
+    def get_instruction(self, at=None):
         if at is None:
             at = self.instruction_pointer
         return self.data[at]
@@ -86,7 +86,7 @@ class BrainFuck:
         """Decrement memory_pointer"""
         if self.memory_pointer > 0:
             self.memory_pointer -= 1
-        #TODO allow writing before the beginning of the memory?
+            #TODO allow writing before the beginning of the memory?
 
     def __memory_inc(self):
         """Increment memory under the pointer
@@ -142,7 +142,6 @@ class BrainFuck:
         self.instruction_pointer = end # jump to the end of loop
 
 
-
     def __loop_end(self):
         raise SyntaxError("Unbalanced closing brace at %d" % self.instruction_pointer)
 
@@ -150,8 +149,44 @@ class BrainFuck:
 class BrainLoller():
     """Třída pro zpracování jazyka brainloller."""
 
+    class Coord():
+        """
+        Handles 2D coordinates with
+
+        Attributes:
+        DIRECTIONS -- basic directions as a list of (x,y) tuplesdefining delta for the move
+        """
+        DIRECTIONS = (
+            (0, -1), #north
+            (1, 0), #east
+            (0, 1), #south
+            (-1, 0)  #west
+            )
+
+        def __init__(self, direction=1, x=0, y=0):
+            self.direction = direction # head to east
+            self.x, self.y = x, y # top-left corner
+
+        def get_dir(self):
+            return self.DIRECTIONS[self.direction]
+
+        def get_pos(self):
+            return (self.x, self.y)
+
+        def step(self):
+            self.x += self.get_dir()[0]
+            self.y += self.get_dir()[1]
+
+        def turn_left(self):
+            self.direction = (self.direction - 1) % 4
+
+        def turn_right(self):
+            self.direction = (self.direction + 1) % 4
+
+
     def __init__(self, filename):
-        pass
+        self.dir = self.Coord()
+
 
     #
     # načtení dat programu z obrázku

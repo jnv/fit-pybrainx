@@ -138,12 +138,31 @@ class ImagePngTest(unittest.TestCase):
         img = self.PngReader('test_data/sachovnice.png')
         img.load()
 
-        assert img.get_pixel(0,0) == b'\xff\x00\x00'
-        assert img.get_pixel(1,0) == b'\x00\xff\x00'
-        assert img.get_pixel(2,0) == b'\x00\x00\xff'
-        assert img.get_pixel(0,1) == b'\xff\xff\xff'
-        assert img.get_pixel(1,1) == b'\x7f\x7f\x7f'
-        assert img.get_pixel(2,1) == b'\x00\x00\x00'
+        assert img.get_pixel(0, 0) == b'\xff\x00\x00'
+        assert img.get_pixel(1, 0) == b'\x00\xff\x00'
+        assert img.get_pixel(2, 0) == b'\x00\x00\xff'
+        assert img.get_pixel(0, 1) == b'\xff\xff\xff'
+        assert img.get_pixel(1, 1) == b'\x7f\x7f\x7f'
+        assert img.get_pixel(2, 1) == b'\x00\x00\x00'
+
+
+class BrainLollerTest(unittest.TestCase):
+    def setUp(self):
+        self.BL = brainx.BrainLoller
+
+    def test_coord(self):
+        coord = self.BL.Coord(direction=1, x=5, y=5)
+
+        self.assertEqual(coord.get_dir(), (1, 0))
+        coord.step()
+        self.assertEqual(coord.get_pos(), (6, 5))
+        coord.turn_left()
+        self.assertEqual(coord.get_dir(), (0, -1))
+        coord.step()
+        self.assertEqual(coord.get_pos(), (6, 4))
+        coord.turn_left()
+        self.assertEqual(coord.get_dir(), (-1, 0))
+
 
 # zajištění spuštění testů při zavolání souboru z příkazové řádky
 if __name__ == '__main__':
