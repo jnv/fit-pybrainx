@@ -202,6 +202,9 @@ class BrainLoller():
 
 
     def _img_iter(self):
+        """
+        Iterator for PNG image, handles coord rotation
+        """
         while True:
             x, y = self.coord.get_pos()
             try:
@@ -218,10 +221,6 @@ class BrainLoller():
 
             self.coord.step()
 
-    #
-    # načtení dat programu z obrázku
-    # ~ vrací řetězec obsahující data programu v brainfucku
-    #
     def load(self):
         """
         Load and process the image
@@ -240,6 +239,10 @@ class BrainLoller():
 
 
 class BrainCopter(BrainLoller):
+    """
+    Handles BrainCopter translation to BrainFuck
+    """
+
     COMMANDS = {
         0: '>',
         1: '<',
@@ -262,7 +265,7 @@ class BrainCopter(BrainLoller):
 
             r, g, b = pixel
 
-            cmd = (-2*r + 3*g + b) % 11
+            cmd = (-2 * r + 3 * g + b) % 11
 
             if cmd == 8:
                 self.coord.turn_right()
