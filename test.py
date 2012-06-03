@@ -131,7 +131,7 @@ class ImagePngTest(unittest.TestCase):
             nonf_img.load()
 
             #assert img.lines == nonf_img.lines, "{}: Non-filtered image doesn't match unfiltered one".format(file)
-            self.assertEquals(img.lines, nonf_img.lines,
+            self.assertEqual(img.lines, nonf_img.lines,
                 "{}: Non-filtered image doesn't match unfiltered one".format(file))
 
     def test_png_get_pixel(self):

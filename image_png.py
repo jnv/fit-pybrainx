@@ -100,6 +100,7 @@ class PngReader():
                 continue
             chunk_funcs[type](data)
 
+        self.file.close()
         self.idat_decomp += self.decompressobj.flush()
         logging.debug("ImagePng: processing raw data ")
         self.__process_raw(self.idat_decomp)
